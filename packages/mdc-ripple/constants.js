@@ -15,34 +15,35 @@
  */
 
 export const ROOT = 'mdc-ripple';
-export const UPGRADED = `${ROOT}-upgraded`;
+export const UPGRADED = 'mdc-ripple-upgraded';
 
 export const cssClasses = {
   // Ripple is a special case where the "root" component is really a "mixin" of sorts,
   // given that it's an 'upgrade' to an existing component. That being said it is the root
   // CSS class that all other CSS classes derive from.
-  ROOT: UPGRADED,
-  UNBOUNDED: `${UPGRADED}--unbounded`,
-  BG_ACTIVE: `${UPGRADED}--background-active`,
-  BG_BOUNDED_ACTIVE_FILL: `${UPGRADED}--background-bounded-active-fill`,
-  FG_BOUNDED_ACTIVE_FILL: `${UPGRADED}--foreground-bounded-active-fill`,
-  FG_UNBOUNDED_ACTIVATION: `${UPGRADED}--foreground-unbounded-activation`,
-  FG_UNBOUNDED_DEACTIVATION: `${UPGRADED}--foreground-unbounded-deactivation`,
+  ROOT: 'mdc-ripple-upgraded',
+  UNBOUNDED: 'mdc-ripple-upgraded--unbounded',
+  BG_ACTIVE: 'mdc-ripple-upgraded--background-active',
+  BG_BOUNDED_ACTIVE_FILL: 'mdc-ripple-upgraded--background-bounded-active-fill',
+  FG_BOUNDED_ACTIVE_FILL: 'mdc-ripple-upgraded--foreground-bounded-active-fill',
+  FG_BOUNDED_DEACTIVATION: 'mdc-ripple-upgraded--foreground-bounded-deactivation',
+  FG_UNBOUNDED_ACTIVATION: 'mdc-ripple-upgraded--foreground-unbounded-activation',
+  FG_UNBOUNDED_DEACTIVATION: 'mdc-ripple-upgraded--foreground-unbounded-deactivation',
 };
 
 export const strings = {
-  VAR_SURFACE_WIDTH: `--${ROOT}-surface-width`,
-  VAR_SURFACE_HEIGHT: `--${ROOT}-surface-height`,
-  VAR_FG_SIZE: `--${ROOT}-fg-size`,
-  VAR_FG_UNBOUNDED_OPACITY_DURATION: `--${ROOT}-fg-unbounded-opacity-duration`,
-  VAR_FG_UNBOUNDED_TRANSFORM_DURATION: `--${ROOT}-fg-unbounded-transform-duration`,
-  VAR_LEFT: `--${ROOT}-left`,
-  VAR_TOP: `--${ROOT}-top`,
-  VAR_TRANSLATE_END: `--${ROOT}-translate-end`,
-  VAR_FG_APPROX_XF: `--${ROOT}-fg-approx-xf`,
-  VAR_FG_SCALE: `--${ROOT}-fg-scale`,
-  VAR_FG_TRANSLATE_START: `--${ROOT}-fg-translate-start`,
-  VAR_FG_TRANSLATE_END: `--${ROOT}-fg-translate-end`,
+  VAR_SURFACE_WIDTH: '--mdc-ripple-surface-width',
+  VAR_SURFACE_HEIGHT: '--mdc-ripple-surface-height',
+  VAR_FG_SIZE: '--mdc-ripple-fg-size',
+  VAR_FG_UNBOUNDED_OPACITY_DURATION: '--mdc-ripple-fg-unbounded-opacity-duration',
+  VAR_FG_UNBOUNDED_TRANSFORM_DURATION: '--mdc-ripple-fg-unbounded-transform-duration',
+  VAR_LEFT: '--mdc-ripple-left',
+  VAR_TOP: '--mdc-ripple-top',
+  VAR_TRANSLATE_END: '--mdc-ripple-translate-end',
+  VAR_FG_APPROX_XF: '--mdc-ripple-fg-approx-xf',
+  VAR_FG_SCALE: '--mdc-ripple-fg-scale',
+  VAR_FG_TRANSLATE_START: '--mdc-ripple-fg-translate-start',
+  VAR_FG_TRANSLATE_END: '--mdc-ripple-fg-translate-end',
 };
 
 export const numbers = {

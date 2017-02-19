@@ -19,43 +19,8 @@ import lolex from 'lolex';
 
 import {testFoundation, captureHandlers} from './helpers';
 import {cssClasses, strings, numbers} from '../../../packages/mdc-ripple/constants';
-import {getCorrectEventName} from '../../../packages/mdc-animation';
-
-const windowObj = td.object({
-  document: {
-    createElement: (str) => ({
-      style: {
-        animation: 'none',
-        transition: 'none',
-      },
-    }),
-  },
-});
 
 suite('MDCRippleFoundation - Deactivation logic');
-
-testFoundation('runs deactivation UX on touchend after touchstart', ({foundation, adapter, mockRaf}) => {
-  const handlers = captureHandlers(adapter);
-  foundation.init();
-  mockRaf.flush();
-
-  handlers.touchstart();
-  mockRaf.flush();
-  handlers.touchend({changedTouches: [{pageX: 0, pageY: 0}]});
-  mockRaf.flush();
-
-  td.verify(adapter.removeClass(cssClasses.BG_ACTIVE));
-  td.verify(adapter.addClass(cssClasses.BG_BOUNDED_ACTIVE_FILL));
-  td.verify(adapter.addClass(cssClasses.FG_BOUNDED_ACTIVE_FILL));
-
-  // Test removal of classes on end event
-  handlers[getCorrectEventName(windowObj, 'transitionend')]();
-  mockRaf.flush();
-  td.verify(adapter.removeClass(cssClasses.BG_BOUNDED_ACTIVE_FILL), {times: 2});
-  handlers[getCorrectEventName(windowObj, 'animationend')]();
-  mockRaf.flush();
-  td.verify(adapter.removeClass(cssClasses.FG_BOUNDED_ACTIVE_FILL), {times: 2});
-});
 
 testFoundation('runs deactivation UX on pointerup after pointerdown', ({foundation, adapter, mockRaf}) => {
   const handlers = captureHandlers(adapter);
@@ -101,26 +66,6 @@ testFoundation('runs deactivation UX on public deactivate() call', ({foundation,
   td.verify(adapter.addClass(cssClasses.FG_BOUNDED_ACTIVE_FILL));
 });
 
-testFoundation('runs deactivation UX mousedown when pressed for longer than deactivation timeout',
-      ({foundation, adapter, mockRaf}) => {
-  const handlers = captureHandlers(adapter);
-  const clock = lolex.install();
-  foundation.init();
-  mockRaf.flush();
-
-  handlers.mousedown();
-  mockRaf.flush();
-
-  clock.tick(numbers.DEACTIVATION_TIMEOUT_MS);
-  mockRaf.flush();
-
-  td.verify(adapter.removeClass(cssClasses.BG_ACTIVE));
-  td.verify(adapter.addClass(cssClasses.BG_BOUNDED_ACTIVE_FILL));
-  td.verify(adapter.addClass(cssClasses.FG_BOUNDED_ACTIVE_FILL));
-
-  clock.uninstall();
-});
-
 testFoundation('does not run deactivation UX mousedown when pressed for longer than deactivation timeout ' +
                'for unbounded surfaces',
       ({foundation, adapter, mockRaf}) => {
@@ -146,76 +91,6 @@ testFoundation('does not run deactivation UX mousedown when pressed for longer t
   td.verify(adapter.removeClass(cssClasses.BG_BOUNDED_ACTIVE_FILL));
   td.verify(adapter.removeClass(cssClasses.FG_UNBOUNDED_DEACTIVATION));
   td.verify(adapter.removeClass(cssClasses.FG_BOUNDED_ACTIVE_FILL));
-
-  clock.uninstall();
-});
-
-testFoundation('runs deactivation UX keydown when pressed for longer than deactivation timeout',
-      ({foundation, adapter, mockRaf}) => {
-  const handlers = captureHandlers(adapter);
-  const clock = lolex.install();
-  const left = 50;
-  const top = 50;
-  const width = 200;
-  const height = 100;
-
-  td.when(adapter.computeBoundingRect()).thenReturn({width, height, left, top});
-  td.when(adapter.isSurfaceActive()).thenReturn(true, false);
-
-  foundation.init();
-  mockRaf.flush();
-
-  handlers.keydown();
-  mockRaf.flush();
-
-  clock.tick(numbers.DEACTIVATION_TIMEOUT_MS);
-  mockRaf.flush();
-
-  td.verify(adapter.removeClass(cssClasses.BG_ACTIVE));
-  td.verify(adapter.addClass(cssClasses.BG_BOUNDED_ACTIVE_FILL));
-  td.verify(adapter.addClass(cssClasses.FG_BOUNDED_ACTIVE_FILL));
-
-  clock.uninstall();
-});
-
-testFoundation('runs deactivation UX pointerdown when pressed for longer than deactivation timeout',
-      ({foundation, adapter, mockRaf}) => {
-  const handlers = captureHandlers(adapter);
-  const clock = lolex.install();
-
-  foundation.init();
-  mockRaf.flush();
-
-  handlers.pointerdown();
-  mockRaf.flush();
-
-  clock.tick(numbers.DEACTIVATION_TIMEOUT_MS);
-  mockRaf.flush();
-
-  td.verify(adapter.removeClass(cssClasses.BG_ACTIVE));
-  td.verify(adapter.addClass(cssClasses.BG_BOUNDED_ACTIVE_FILL));
-  td.verify(adapter.addClass(cssClasses.FG_BOUNDED_ACTIVE_FILL));
-
-  clock.uninstall();
-});
-
-testFoundation('runs deactivation UX touchstart when pressed for longer than deactivation timeout',
-      ({foundation, adapter, mockRaf}) => {
-  const handlers = captureHandlers(adapter);
-  const clock = lolex.install();
-
-  foundation.init();
-  mockRaf.flush();
-
-  handlers.touchstart();
-  mockRaf.flush();
-
-  clock.tick(numbers.DEACTIVATION_TIMEOUT_MS);
-  mockRaf.flush();
-
-  td.verify(adapter.removeClass(cssClasses.BG_ACTIVE));
-  td.verify(adapter.addClass(cssClasses.BG_BOUNDED_ACTIVE_FILL));
-  td.verify(adapter.addClass(cssClasses.FG_BOUNDED_ACTIVE_FILL));
 
   clock.uninstall();
 });
@@ -263,82 +138,6 @@ testFoundation('only re-activates when there are no additional pointer events to
   mockRaf.flush();
 
   td.verify(adapter.addClass(cssClasses.BG_ACTIVE), {times: 2});
-});
-
-testFoundation('sets FG position from the coords to the center within surface on pointer deactivation',
-    ({foundation, adapter, mockRaf}) => {
-  const handlers = captureHandlers(adapter);
-  const left = 50;
-  const top = 50;
-  const width = 200;
-  const height = 100;
-  const maxSize = Math.max(width, height);
-  const initialSize = maxSize * numbers.INITIAL_ORIGIN_SCALE;
-  const pageX = 100;
-  const pageY = 75;
-
-  td.when(adapter.computeBoundingRect()).thenReturn({width, height, left, top});
-  foundation.init();
-  mockRaf.flush();
-
-  handlers.mousedown();
-  mockRaf.flush();
-  handlers.mouseup({pageX, pageY});
-  mockRaf.flush();
-
-  const startPosition = {
-    x: pageX - left - (initialSize / 2),
-    y: pageY - top - (initialSize / 2),
-  };
-
-  const endPosition = {
-    x: (width / 2) - (initialSize / 2),
-    y: (height / 2) - (initialSize / 2),
-  };
-
-  td.verify(adapter.updateCssVariable(strings.VAR_FG_TRANSLATE_START,
-      `${startPosition.x}px, ${startPosition.y}px`));
-  td.verify(adapter.updateCssVariable(strings.VAR_FG_TRANSLATE_END,
-      `${endPosition.x}px, ${endPosition.y}px`));
-});
-
-testFoundation('takes scroll offset into account when computing position', ({foundation, adapter, mockRaf}) => {
-  const handlers = captureHandlers(adapter);
-  const left = 50;
-  const top = 50;
-  const width = 200;
-  const height = 100;
-  const x = 25;
-  const y = 25;
-  const maxSize = Math.max(width, height);
-  const initialSize = maxSize * numbers.INITIAL_ORIGIN_SCALE;
-  const pageX = 100;
-  const pageY = 75;
-
-  td.when(adapter.computeBoundingRect()).thenReturn({width, height, left, top});
-  td.when(adapter.getWindowPageOffset()).thenReturn({x, y});
-  foundation.init();
-  mockRaf.flush();
-
-  handlers.mousedown();
-  mockRaf.flush();
-  handlers.mouseup({pageX, pageY});
-  mockRaf.flush();
-
-  const startPosition = {
-    x: pageX - left - x - (initialSize / 2),
-    y: pageY - top - y - (initialSize / 2),
-  };
-
-  const endPosition = {
-    x: (width / 2) - (initialSize / 2),
-    y: (height / 2) - (initialSize / 2),
-  };
-
-  td.verify(adapter.updateCssVariable(strings.VAR_FG_TRANSLATE_START,
-      `${startPosition.x}px, ${startPosition.y}px`));
-  td.verify(adapter.updateCssVariable(strings.VAR_FG_TRANSLATE_END,
-      `${endPosition.x}px, ${endPosition.y}px`));
 });
 
 testFoundation('sets unbounded FG position to center on non-pointer deactivation', ({foundation, adapter, mockRaf}) => {
